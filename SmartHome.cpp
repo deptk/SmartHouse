@@ -40,7 +40,7 @@ void setup() {
 }
 
 void loop() {
-
+float h, t, hic;
   EthernetClient client = server.available();
   client.println("HTTP/1.1 200 OK");
   client.println("Content-Type: text/html");
