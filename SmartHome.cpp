@@ -62,6 +62,7 @@ void loop() {
     float h = dht.readHumidity();                   // Read humidity with DHT21
     float t = dht.readTemperature();                // Read temperature as Celsius with DHT21
     float hic = dht.computeHeatIndex(t, h, false);  // Compute heat index in Celsius with DHT21
+  }
     display.showNumberDec(ds.getTempCByIndex(0));
     client.println("<p><font size='55' color='red' face='Arial Black'>");
     client.println(ds.getTempCByIndex(0));
@@ -85,7 +86,6 @@ void loop() {
     client.println(t);
     client.println("&#176;C");
     client.println("</font></p>");
-  }
   client.println("</body></html>");
   client.stop();
 }
