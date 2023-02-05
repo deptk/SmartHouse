@@ -40,10 +40,18 @@ void setup() {
 }
 
 void loop() {
-float h, t, hic;
-  EthernetClient client = server.available();
+  float h, t, hic;
+  if (timing == 0 || millis() - timing > 600000) {  //если timing равен 0 (только что включили ардуинку) или больше 10 минут, то...
+    timing = millis();
+    ds.requestTemperatures();                       //...запрашиваем температуру с датчиков DS
+    display.showNumberDec(ds.getTempCByIndex(0));   // вывод температуры на дисплей
+    h = dht.readHumidity();                   // Read humidity with DHT21
+    t = dht.readTemperature();                // Read temperature as Celsius with DHT21
+    hic = dht.computeHeatIndex(t, h, false);  // Compute heat index in Celsius with DHT21
+  }
+
+  EthernetClient client = webserver.available();
   client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/html");
   client.println("Connection: close");
   client.println();
   client.println("<!DOCTYPE HTML><html><head>");
@@ -56,36 +64,28 @@ float h, t, hic;
   client.println("<h1>");
   client.println(time.gettime("H:i"));
   client.println("</font></h1>");
-  if (timing == 0 || millis() - timing > 600000) {
-    timing = millis();
-    ds.requestTemperatures();                       //...запрашиваем температуру (считываем температуру с датчиков ds)
-    float h = dht.readHumidity();                   // Read humidity with DHT21
-    float t = dht.readTemperature();                // Read temperature as Celsius with DHT21
-    float hic = dht.computeHeatIndex(t, h, false);  // Compute heat index in Celsius with DHT21
-  }
-    display.showNumberDec(ds.getTempCByIndex(0));
-    client.println("<p><font size='55' color='red' face='Arial Black'>");
-    client.println(ds.getTempCByIndex(0));
-    client.println("&#176;C");
-    client.println("</font></p>");
-    client.println("<h3><font face='Arial'>");
-    client.println("Ощущается как");
-    client.println("</font></h3>");
-    client.println("<p><font size='55' color='red' face='Arial Black'>");
-    client.println(hic);
-    client.println("&#176;C");
-    client.println("</font></p>");
-    client.println("<h3><font face='Arial'>");
-    client.println("Влажность");
-    client.println("</font></h3>");
-    client.println("<p><font size='55' color='red' face='Arial Black'>");
-    client.println(h);
-    client.println("%");
-    client.println("</font></p>");
-    client.println("<p><font size='55' color='red' face='Arial Black'>");
-    client.println(t);
-    client.println("&#176;C");
-    client.println("</font></p>");
+  client.println("<p><font size='55' color='red' face='Arial Black'>");
+  client.println(ds.getTempCByIndex(0));
+  client.println("&#176;C");
+  client.println("</font></p>");
+  client.println("<h3><font face='Arial'>");
+  client.println("Ощущается как");
+  client.println("</font></h3>");
+  client.println("<p><font size='55' color='red' face='Arial Black'>");
+  client.println(hic);
+  client.println("&#176;C");
+  client.println("</font></p>");
+  client.println("<h3><font face='Arial'>");
+  client.println("Влажность");
+  client.println("</font></h3>");
+  client.println("<p><font size='55' color='red' face='Arial Black'>");
+  client.println(h);
+  client.println("%");
+  client.println("</font></p>");
+  client.println("<p><font size='55' color='red' face='Arial Black'>");
+  client.println(t);
+  client.println("&#176;C");
+  client.println("</font></p>");
   client.println("</body></html>");
   client.stop();
 }
